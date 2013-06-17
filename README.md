@@ -1,16 +1,16 @@
 UpShot
 ======
 
-About the Fork
+About this Fork
 --------------
 
-This fork removes the Dropbox dependencies alltogether and replaced it with a custom URL upload setting.
+This fork removes the Dropbox dependencies all-together and replaces it with a custom URL upload feature. Read below for details.
 
 This fork also includes a `.app` binary distributed with the repo. You can simply install the file "UpShot.app" into your Applications folder.
 
 ![](http://zpr.io/PRqH.png)
 
-This is intended to be set to a URL on a server you own, running code which does the following:
+The custom URL is intended to be used in conjunction with a server you own, which does the following:
 
 1. Receive a POST request as application/json
 2. Store the passed Base64-encoded image. It will be POSTed as `{'image': base64(...)}`
