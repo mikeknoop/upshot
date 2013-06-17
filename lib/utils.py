@@ -11,7 +11,7 @@ from AppKit import *
 
 
 CHARS = string.ascii_letters + string.digits
-DEFAULT_SHARE_URL = 'http://dl.dropboxusercontent.com/u/{dropboxid}/Screenshots/'
+# DEFAULT_SHARE_URL = 'http://dl.dropboxusercontent.com/u/{dropboxid}/Screenshots/'
 
 
 def autopooled(f):
@@ -28,18 +28,18 @@ def autopooled(f):
     return pooled_func
 
 
-def detect_dropbox_folder():
-    """
-    Find user's dropbox folder location.
-    They keep it base64-encoded in a file 'host.db' in $HOME/.dropbox.
-    """
-    try:
-        with open(os.path.join(os.environ['HOME'], '.dropbox', 'host.db'),
-                  'r') as f:
-            encoded_dir = f.readlines()[1]
-            return base64.b64decode(encoded_dir)
-    except:
-        return None
+# def detect_dropbox_folder():
+#     """
+#     Find user's dropbox folder location.
+#     They keep it base64-encoded in a file 'host.db' in $HOME/.dropbox.
+#     """
+#     try:
+#         with open(os.path.join(os.environ['HOME'], '.dropbox', 'host.db'),
+#                   'r') as f:
+#             encoded_dir = f.readlines()[1]
+#             return base64.b64decode(encoded_dir)
+#     except:
+#         return None
 
 
 @autopooled
@@ -109,10 +109,10 @@ def share_url(filename, url=None):
 
     if url:  # Custom URL
         return urljoin(url, filename)
-    else:  # Default URL.
-        return urljoin(
-            DEFAULT_SHARE_URL.format(dropboxid=get_pref('dropboxid')),
-            filename)
+    # else:  # Default URL.
+    #     return urljoin(
+    #         DEFAULT_SHARE_URL.format(dropboxid=get_pref('dropboxid')),
+    #         filename)
 
 
 @autopooled

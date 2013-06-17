@@ -48,7 +48,8 @@ def build():
             'CFBundleVersion': RELEASE,
             'CFBundleShortVersionString': RELEASE,
         },
-        'excludes': ['email']
+        'excludes': ['email'],
+        'packages': ['requests'] # force include to bundle ssl certs
     }
 
     setup(

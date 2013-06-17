@@ -2,21 +2,24 @@ import objc
 from Foundation import *
 from LaunchServices import *
 
-import DropboxDetect
-from lib.utils import detect_dropbox_folder, get_pref, set_pref, share_url
+# import DropboxDetect
+from lib.utils import get_pref, set_pref, share_url
+# from lib.utils import detect_dropbox_folder, get_pref, set_pref, share_url
 from lib.windows import UpShotWindowController
 
 
 DEFAULTS = {
     'launchAtStartup': True,
-    'iconset': 'default',  # Which status bar icon? 'default' or 'grayscale'
+    'notification_sound': True,
+    'notification_growl': True,
+    #'iconset': 'default',  # Which status bar icon? 'default' or 'grayscale'
     'randomize': True,  # Randomize screenshot names?
     'copyonly': False,  # Copy (don't move) screen shots.
     'retinascale': False,  # Scale upscaled retina images to low DPI automatically.
-    'customurl': '',  # Empty string means: default Dropbox URL.
+    'upload_url': '',  # Where we are uploading the image to.
 }
-DOMAIN_HELP_URL = ('http://fredericiana.com/2012/12/09/'
-                   'custom-domain-with-dropbox/')
+# DOMAIN_HELP_URL = ('http://fredericiana.com/2012/12/09/'
+#                    'custom-domain-with-dropbox/')
 EXAMPLE_FILENAME = 'hZr9.png'
 
 
@@ -25,7 +28,9 @@ class PreferencesWindowController(UpShotWindowController):
 
     # General
     launchAtStartup = objc.IBOutlet()
-    iconset = objc.IBOutlet()
+    notification_sound = objc.IBOutlet()
+    notification_growl = objc.IBOutlet()
+    # iconset = objc.IBOutlet()
 
     # Screenshots
     randomize = objc.IBOutlet()
@@ -33,13 +38,13 @@ class PreferencesWindowController(UpShotWindowController):
     retinascale = objc.IBOutlet()
 
     # Dropbox metadata
-    dropboxdir = objc.IBOutlet()
-    dropboxid = objc.IBOutlet()
+    # dropboxdir = objc.IBOutlet()
+    # dropboxid = objc.IBOutlet()
 
     # Custom share URLs
-    url_select = objc.IBOutlet()
-    url_text = objc.IBOutlet()
-    url_example = objc.IBOutlet()
+    upload_url = objc.IBOutlet()
+    # url_text = objc.IBOutlet()
+    # url_example = objc.IBOutlet()
 
     def showWindow_(self, sender):
         super(PreferencesWindowController, self).showWindow_(sender)
@@ -48,31 +53,35 @@ class PreferencesWindowController(UpShotWindowController):
     def updateDisplay(self):
         """Update window display from settings."""
         self.launchAtStartup.setState_(get_pref('launchAtStartup'))
-        self.iconset.selectCellWithTag_(
-            1 if get_pref('iconset') == 'grayscale' else 0)
+        self.notification_sound.setState_(get_pref('notification_sound'))
+        self.notification_growl.setState_(get_pref('notification_growl'))
+        # self.iconset.selectCellWithTag_(
+        #     1 if get_pref('iconset') == 'grayscale' else 0)
 
         self.randomize.setState_(get_pref('randomize'))
         self.copyonly.setState_(get_pref('copyonly'))
-        self.copyonly.setState_(get_pref('retinascale'))
+        self.retinascale.setState_(get_pref('retinascale'))
 
-        dropboxdir = detect_dropbox_folder()
-        self.dropboxdir.setStringValue_(
-            dropboxdir or u'None. Install Dropbox?')
-        self.dropboxid.setStringValue_(get_pref('dropboxid'))
+        # dropboxdir = detect_dropbox_folder()
+        # self.dropboxdir.setStringValue_(
+        #     dropboxdir or u'None. Install Dropbox?')
+        # self.dropboxid.setStringValue_(get_pref('dropboxid'))
 
-        customurl = get_pref('customurl')
-        if not customurl:  # Default.
-            self.url_select.selectCellWithTag_(0)
-            self.url_text.setEnabled_(False)
-            self.url_text.setStringValue_('')
-            self.url_example.setStringValue_(share_url(EXAMPLE_FILENAME,
-                                                       url=''))
-        else:  # Custom.
-            self.url_select.selectCellWithTag_(1)
-            self.url_text.setEnabled_(True)
-            self.url_text.setStringValue_(customurl)
-            self.url_example.setStringValue_(share_url(EXAMPLE_FILENAME,
-                                                       url=customurl))
+        # customurl = get_pref('customurl')
+        # if not customurl:  # Default.
+        #     self.upload_url.selectCellWithTag_(0)
+        #     # self.url_text.setEnabled_(False)
+        #     # self.url_text.setStringValue_('')
+        #     # self.url_example.setStringValue_(share_url(EXAMPLE_FILENAME,
+        #     #                                            url=''))
+        # else:  # Custom.
+        # self.upload_url.selectCellWithTag_(1)
+        # self.url_text.setEnabled_(True)
+        # self.url_text.setStringValue_(customurl)
+        # self.url_example.setStringValue_(share_url(EXAMPLE_FILENAME,
+        #                                            url=customurl))
+
+        self.upload_url.setStringValue_(get_pref('upload_url'))
 
     @objc.IBAction
     def saveSettings_(self, sender):
@@ -80,48 +89,54 @@ class PreferencesWindowController(UpShotWindowController):
         set_pref('launchAtStartup', bool(self.launchAtStartup.state()))
         launch_at_startup(bool(self.launchAtStartup.state()))
 
-        # Iconset
-        iconset_sel = self.iconset.selectedCell().tag()
-        if iconset_sel == 1:  # Grayscale
-            set_pref('iconset', 'grayscale')
-        else:
-            set_pref('iconset', 'default')
-        upshot = NSApplication.sharedApplication().delegate()
-        upshot.update_menu()
+        set_pref('notification_sound', bool(self.notification_sound.state()))
+        set_pref('notification_growl', bool(self.notification_growl.state()))
+
+
+        # # Iconset
+        # iconset_sel = self.iconset.selectedCell().tag()
+        # if iconset_sel == 1:  # Grayscale
+        #     set_pref('iconset', 'grayscale')
+        # else:
+        #     set_pref('iconset', 'default')
+        # upshot = NSApplication.sharedApplication().delegate()
+        # upshot.update_menu()
 
         set_pref('randomize', bool(self.randomize.state()))
         set_pref('copyonly', bool(self.copyonly.state()))
         set_pref('retinascale', bool(self.retinascale.state()))
 
-        try:
-            set_pref('dropboxid', int(self.dropboxid.stringValue()))
-        except ValueError:
-            pass
+        # try:
+        #     set_pref('dropboxid', int(self.dropboxid.stringValue()))
+        # except ValueError:
+        #     pass
 
         # Custom URL settings.
-        if self.url_select.selectedCell().tag() == 0:  # Default
-            self.url_text.setStringValue_('')
-            self.url_text.setEnabled_(False)
-            self.url_example.setStringValue_(share_url(EXAMPLE_FILENAME,
-                                                       url=''))
-            set_pref('customurl', '')
-        else:  # Custom
-            self.url_text.setEnabled_(True)
-            self.url_example.setStringValue_(
-                share_url(EXAMPLE_FILENAME, url=self.url_text.stringValue()))
-            set_pref('customurl', self.url_text.stringValue())
+        # if self.upload_url.selectedCell().tag() == 0:  # Default
+        #     self.url_text.setStringValue_('')
+        #     self.url_text.setEnabled_(False)
+        #     self.url_example.setStringValue_(share_url(EXAMPLE_FILENAME,
+        #                                                url=''))
+        #     set_pref('customurl', '')
+        # else:  # Custom
+            # self.url_text.setEnabled_(True)
+            # self.url_example.setStringValue_(
+            #     share_url(EXAMPLE_FILENAME, url=self.url_text.stringValue()))
+            # set_pref('customurl', self.url_text.stringValue())
 
-    @objc.IBAction
-    def dropboxDetect_(self, sender):
-        """Open dropbox detection window."""
-        DropboxDetect.DropboxDetectWindowController.showWindow()
-        self.close()
+        set_pref('upload_url', self.upload_url.stringValue())
 
-    @objc.IBAction
-    def domainHelp_(self, sender):
-        """Open URL to learn about custom domain setup with Dropbox."""
-        sw = NSWorkspace.sharedWorkspace()
-        sw.openURL_(NSURL.URLWithString_(DOMAIN_HELP_URL))
+    # @objc.IBAction
+    # def dropboxDetect_(self, sender):
+    #     """Open dropbox detection window."""
+    #     DropboxDetect.DropboxDetectWindowController.showWindow()
+    #     self.close()
+
+    # @objc.IBAction
+    # def domainHelp_(self, sender):
+    #     """Open URL to learn about custom domain setup with Dropbox."""
+    #     sw = NSWorkspace.sharedWorkspace()
+    #     sw.openURL_(NSURL.URLWithString_(DOMAIN_HELP_URL))
 
 
 def launch_at_startup(switch=True):

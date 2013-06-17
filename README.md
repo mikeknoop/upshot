@@ -1,6 +1,23 @@
 UpShot
 ======
 
+About the Fork
+--------------
+
+This fork removes the Dropbox dependencies alltogether and replaced it with a custom URL upload setting.
+
+This fork also includes a `.app` binary distributed with the repo. You can simply install the file "UpShot.app" into your Applications folder.
+
+![](http://zpr.io/PRqH.png)
+
+This is intended to be set to a URL on a server you own, running code which does the following:
+
+1. Receive a POST request as application/json
+2. Store the passed Base64-encoded image. It will be POSTed as `{'image': base64(...)}`
+3. Return a publicly accessible URL where the image can be found, as application/json, like this: `{'link': 'http://example.com/.../5Eb3.png'}`
+
+The rest of this readme pertains to the original UpShot documentation.
+
 ![](https://raw.github.com/fwenzel/upshot/master/upshot.png)
 
 UpShot is an automatic screen shot uploader for OS X, written in Python.
